@@ -11,7 +11,7 @@ This project is primarily an exploration and accessibility tool.
 -   **Phase 1: Vision & Data Acquisition**
     -   ✅ **Step 1: Display Camera Feed:** The application successfully displays a live feed from the selected webcam.
     -   ✅ **Step 2: Detect Faces:** The application now detects faces and draws bounding boxes around them (correctly mirrored).
-    -   ⏳ **Step 3: Detect Facial Landmarks (Pupils & Pose):** In progress.
+    -   ✅ **Step 3: Detect Facial Landmarks (Pupils & Pose):** The application detects pupils and head pose, populating `GazeInputData`, and displays pupil indicators.
     -   ... (See `cline_docs/progress.md` for full plan)
 
 ## Core Technologies

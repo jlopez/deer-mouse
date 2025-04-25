@@ -28,7 +28,7 @@ Step 1 (Display Camera Feed) is complete.
     *   **Goal:** Enhance the `Vision` processing to detect detailed facial landmarks, specifically the pupils and head pose. Draw indicators (e.g., circles for pupils, axes for pose) over the detected locations on the video feed. Define `GazeInputData` struct.
     *   **Technologies:** `Vision` (`VNDetectFaceLandmarksRequest`), `AVFoundation`, SwiftUI.
     *   **Deliverable:** The application draws markers on facial landmarks (pupils) and indicates head pose in the live video feed. The `GazeInputData` struct (containing `leftPupil`, `rightPupil`, `roll`, `pitch`, `yaw`) is defined and populated.
-    *   **Status:** Pending
+    *   **Status:** **Completed - 4/25/2025**
 
 **Phase 2: Calibration & Mapping**
 
@@ -60,4 +60,4 @@ Step 1 (Display Camera Feed) is complete.
 
 ## Next Immediate Step
 
--   Begin implementation of **Step 3: Detect Facial Landmarks (Pupils & Pose)**.
+-   Begin implementation of **Step 4: Basic Calibration UI & Data Capture**.

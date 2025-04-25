@@ -7,7 +7,8 @@ import SwiftUI // Needed for CGRect and DispatchQueue.main
 // Conform to delegate protocol
 class CameraManager: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     @Published var session = AVCaptureSession()
-    @Published var faceBoundingBoxes: [CGRect] = [] // Published property for results
+    @Published var faceBoundingBoxes: [CGRect] = [] // Keep for potential overlay drawing
+    @Published var latestGazeData: GazeInputData? = nil // Published property for gaze data
 
     private var device: AVCaptureDevice?
     private var input: AVCaptureDeviceInput?
@@ -136,18 +137,24 @@ class CameraManager: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleB
         // If the image appears rotated, experiment with .left, .right, or .down.
         let exifOrientation = CGImagePropertyOrientation.up // Adjust if needed
 
-        let detectFaceRequest = VNDetectFaceRectanglesRequest { [weak self] request, error in
+        // Change to landmarks request
+        let detectFaceLandmarksRequest = VNDetectFaceLandmarksRequest { [weak self] request, error in
             guard let self = self else { return }
 
             if let error = error {
-                print("Face detection error: \(error.localizedDescription)")
+                print("Face landmarks detection error: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.faceBoundingBoxes = []
+                    self.latestGazeData = nil
+                }
                 return
             }
 
-            guard let results = request.results as? [VNFaceObservation] else {
-                print("No face observations found.")
+            guard let results = request.results as? [VNFaceObservation], !results.isEmpty else {
+                // print("No face observations found or results empty.") // Can be noisy
                 DispatchQueue.main.async {
                     self.faceBoundingBoxes = [] // Clear boxes if no faces
+                    self.latestGazeData = nil // Clear gaze data if no faces
                 }
                 return
             }
@@ -156,32 +163,85 @@ class CameraManager: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleB
             let imageWidth = CGFloat(CVPixelBufferGetWidth(pixelBuffer))
             let imageHeight = CGFloat(CVPixelBufferGetHeight(pixelBuffer))
 
-            // Convert normalized Vision coordinates to SwiftUI coordinates (origin top-left)
-            let convertedRects = results.map { observation -> CGRect in
+            // --- Bounding Box Calculation (Keep for potential overlay) ---
+            let boundingBoxes = results.map { observation -> CGRect in
                 let boundingBox = observation.boundingBox // Normalized coordinates (origin bottom-left)
-
-                // Transform to UIKit/AppKit coordinates (origin top-left) AND mirror horizontally
-                let convertedBox = CGRect(
+                // Transform to SwiftUI coordinates (origin top-left, mirrored)
+                return CGRect(
                     x: (1 - boundingBox.origin.x - boundingBox.width) * imageWidth, // Mirror X
                     y: (1 - boundingBox.origin.y - boundingBox.height) * imageHeight, // Flip Y
                     width: boundingBox.width * imageWidth,
                     height: boundingBox.height * imageHeight
                 )
-                return convertedBox
             }
 
-            // Update the published property on the main thread
+            // --- Landmark and Pose Extraction (Focus on the first detected face) ---
+            var currentGazeData: GazeInputData? = nil
+            if let firstFace = results.first, // Process only the first face for now
+               let landmarks = firstFace.landmarks,
+               let leftPupil = landmarks.leftPupil, // VNPoint in normalized face bounding box coords
+               let rightPupil = landmarks.rightPupil, // VNPoint in normalized face bounding box coords
+               let pose = firstFace.yaw?.doubleValue // Use yaw for now, add pitch/roll later if needed
+            {
+                // Function to convert normalized landmark point (CGPoint) to mirrored pixel coordinates (CGPoint)
+                func convertLandmarkPoint(_ point: CGPoint, in boundingBox: CGRect) -> CGPoint {
+                    // point.x and point.y are normalized relative to the boundingBox
+                    // 1. Calculate position within the bounding box in normalized image coordinates (bottom-left origin)
+                    let xNormBL = boundingBox.origin.x + (point.x * boundingBox.width)
+                    let yNormBL = boundingBox.origin.y + (point.y * boundingBox.height)
+                    // 2. Convert to pixel coordinates (top-left origin, mirrored)
+                    let pixelX = (1 - xNormBL) * imageWidth // Mirror X
+                    let pixelY = (1 - yNormBL) * imageHeight // Flip Y
+                    return CGPoint(x: pixelX, y: pixelY)
+                }
+
+                // Ensure we have points before trying to access index 0
+                guard !leftPupil.normalizedPoints.isEmpty, !rightPupil.normalizedPoints.isEmpty else {
+                    print("Pupil landmark regions are empty.")
+                    DispatchQueue.main.async {
+                        self.latestGazeData = nil // Clear gaze data if pupils aren't found
+                    }
+                    return // Exit the completion handler for this frame
+                }
+
+                let leftPupilPixel = convertLandmarkPoint(leftPupil.normalizedPoints[0], in: firstFace.boundingBox)
+                let rightPupilPixel = convertLandmarkPoint(rightPupil.normalizedPoints[0], in: firstFace.boundingBox)
+
+                // Extract pose angles (convert NSNumber to Double, radians assumed)
+                let yawAngle = firstFace.yaw?.doubleValue ?? 0.0
+                let pitchAngle = firstFace.pitch?.doubleValue ?? 0.0
+                let rollAngle = firstFace.roll?.doubleValue ?? 0.0
+
+                currentGazeData = GazeInputData(
+                    leftPupil: leftPupilPixel,
+                    rightPupil: rightPupilPixel,
+                    roll: rollAngle,
+                    pitch: pitchAngle,
+                    yaw: yawAngle
+                )
+            } else {
+                 // print("Could not extract landmarks or pose from the first face.") // Can be noisy
+            }
+
+
+            // Update the published properties on the main thread
             DispatchQueue.main.async {
-                self.faceBoundingBoxes = convertedRects
-                // print("Detected \(convertedRects.count) faces.") // Optional debug print
+                self.faceBoundingBoxes = boundingBoxes // Update bounding boxes
+                self.latestGazeData = currentGazeData // Update gaze data (will be nil if no face/landmarks)
+                 // if let gaze = currentGazeData { print("Gaze: \(gaze)") } // Optional debug print
             }
         }
 
         // Perform the request
         do {
-            try sequenceHandler.perform([detectFaceRequest], on: pixelBuffer, orientation: exifOrientation)
+            // Use the landmarks request now
+            try sequenceHandler.perform([detectFaceLandmarksRequest], on: pixelBuffer, orientation: exifOrientation)
         } catch {
-            print("Failed to perform face detection request: \(error.localizedDescription)")
+            print("Failed to perform face landmarks detection request: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                self.faceBoundingBoxes = []
+                self.latestGazeData = nil
+            }
         }
     }
 }
