@@ -30,6 +30,7 @@ struct ContentView: View {
             // Add the overlay view on top
             FaceDetectionOverlayView(
                 faceBoundingBoxes: cameraManager.faceBoundingBoxes,
+                gazeData: cameraManager.latestGazeData, // Pass the gaze data
                 videoPreviewSize: videoPreviewSize // Pass the expected size
             )
             // Allow the overlay to take the same space as the preview
