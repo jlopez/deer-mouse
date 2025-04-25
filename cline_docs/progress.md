@@ -22,7 +22,7 @@ Step 1 (Display Camera Feed) is complete.
     *   **Goal:** Process the video frames using the `Vision` framework to detect human faces. Overlay a visual indicator (e.g., a bounding box) on the detected face(s) in the camera feed.
     *   **Technologies:** `Vision` (`VNDetectFaceRectanglesRequest`), `AVFoundation`, SwiftUI.
     *   **Deliverable:** The application now draws rectangles around detected faces in the live video feed.
-    *   **Status:** Pending
+    *   **Status:** **Completed - 4/25/2025**
 
 3.  **Step 3: Detect Facial Landmarks (Pupils & Pose)**
     *   **Goal:** Enhance the `Vision` processing to detect detailed facial landmarks, specifically the pupils and head pose. Draw indicators (e.g., circles for pupils, axes for pose) over the detected locations on the video feed. Define `GazeInputData` struct.
@@ -60,4 +60,4 @@ Step 1 (Display Camera Feed) is complete.
 
 ## Next Immediate Step
 
--   Begin implementation of **Step 2: Detect Faces**.
+-   Begin implementation of **Step 3: Detect Facial Landmarks (Pupils & Pose)**.
