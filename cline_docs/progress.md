@@ -1,12 +1,12 @@
 # Progress: Eye Gaze Mouse Control
 
-## Current Status: Initialization (Phase 0)
+## Current Status: Phase 1 (Vision & Data Acquisition)
 
-The project is currently in the initial setup phase. Planning is complete, and the foundational Memory Bank documentation has been created. No functional code has been written yet.
+Step 1 (Display Camera Feed) is complete.
 
 ## What Works
 
--   N/A (No implementation yet)
+-   The application displays a live feed from the selected (external) webcam.
 
 ## Detailed Plan & Remaining Steps
 
@@ -16,7 +16,7 @@ The project is currently in the initial setup phase. Planning is complete, and t
     *   **Goal:** Access the default webcam and display the live video stream within the application window.
     *   **Technologies:** Swift, `AVFoundation`, SwiftUI.
     *   **Deliverable:** A running macOS application showing the user's face via the webcam feed.
-    *   **Status:** **Pending**
+    *   **Status:** **Completed - 4/25/2025**
 
 2.  **Step 2: Detect Faces**
     *   **Goal:** Process the video frames using the `Vision` framework to detect human faces. Overlay a visual indicator (e.g., a bounding box) on the detected face(s) in the camera feed.
@@ -60,4 +60,4 @@ The project is currently in the initial setup phase. Planning is complete, and t
 
 ## Next Immediate Step
 
--   Begin implementation of **Step 1: Display Camera Feed**.
+-   Begin implementation of **Step 2: Detect Faces**.
