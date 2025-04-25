@@ -12,6 +12,8 @@ This project is primarily an exploration and accessibility tool.
     -   ✅ **Step 1: Display Camera Feed:** The application successfully displays a live feed from the selected webcam.
     -   ✅ **Step 2: Detect Faces:** The application now detects faces and draws bounding boxes around them (correctly mirrored).
     -   ✅ **Step 3: Detect Facial Landmarks (Pupils & Pose):** The application detects pupils and head pose, populating `GazeInputData`, and displays pupil indicators.
+-   **Phase 2: Calibration & Mapping**
+    -   ✅ **Step 4: Basic Calibration UI & Data Capture:** Implemented UI for calibration target display and controls to capture `ScreenGazePair` data.
     -   ... (See `cline_docs/progress.md` for full plan)
 
 ## Core Technologies

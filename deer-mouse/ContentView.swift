@@ -9,37 +9,84 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var cameraManager = CameraManager()
+    @StateObject private var calibrationViewModel = CalibrationViewModel() // Add Calibration VM
 
     // Define a constant for the expected video preview size for scaling calculations
     // TODO: Ideally, get this dynamically from CameraManager or the video format.
     private let videoPreviewSize = CGSize(width: 1920, height: 1080)
 
     var body: some View {
-        ZStack { // Use ZStack to overlay views
-            CameraPreviewView(session: cameraManager.session)
-                // Keep the frame for layout, but the overlay will use GeometryReader
+        // --- UI Controls ---
+        VStack {
+            ZStack { // Use ZStack to overlay views
+                CameraPreviewView(session: cameraManager.session)
+                    // Keep the frame for layout, but the overlay will use GeometryReader
+                    .frame(minWidth: 640, minHeight: 480)
+                    .onAppear {
+                        cameraManager.checkPermissions() // Check permissions first
+                        cameraManager.startSession()
+                    }
+                    .onDisappear {
+                        cameraManager.stopSession()
+                    }
+
+                // Add the overlay view on top
+                FaceDetectionOverlayView(
+                    faceBoundingBoxes: cameraManager.faceBoundingBoxes,
+                    gazeData: cameraManager.latestGazeData, // Pass the gaze data
+                    videoPreviewSize: videoPreviewSize // Pass the expected size
+                )
+                // Allow the overlay to take the same space as the preview
                 .frame(minWidth: 640, minHeight: 480)
-                .onAppear {
-                    cameraManager.checkPermissions() // Check permissions first
-                    cameraManager.startSession()
-                }
-                .onDisappear {
-                    cameraManager.stopSession()
-                }
 
-            // Add the overlay view on top
-            FaceDetectionOverlayView(
-                faceBoundingBoxes: cameraManager.faceBoundingBoxes,
-                gazeData: cameraManager.latestGazeData, // Pass the gaze data
-                videoPreviewSize: videoPreviewSize // Pass the expected size
-            )
-            // Allow the overlay to take the same space as the preview
-            .frame(minWidth: 640, minHeight: 480)
+                // --- Calibration Target Overlay ---
+                if calibrationViewModel.isCalibrating {
+                    if let targetPoint = calibrationViewModel.currentTargetPoint {
+                        CalibrationTargetView(position: targetPoint)
+                            // Ensure the target view covers the same area conceptually
+                            .frame(minWidth: 640, minHeight: 480)
+                            .allowsHitTesting(false) // Prevent target from blocking interactions if needed
+                    } else {
+                        // Optionally show a message when calibration is done but before isCalibrating is false
+                        Text("Calibration Complete!")
+                            .padding()
+                            .background(Color.green.opacity(0.8))
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                }
+                // --- End Calibration Target Overlay ---
 
-            // Optional: Add other UI elements here later if needed, potentially outside the ZStack or conditionally within it.
-        }
-        .padding() // Apply padding to the ZStack container
-    }
+            } // End ZStack
+
+            Spacer() // Push controls to the bottom
+            HStack {
+                Button("Start Calibration") {
+                    calibrationViewModel.startCalibration()
+                }
+                .disabled(calibrationViewModel.isCalibrating) // Disable if already calibrating
+
+                if calibrationViewModel.isCalibrating {
+                    Button("Record Point") {
+                        if let gazeData = cameraManager.latestGazeData {
+                            calibrationViewModel.recordDataPoint(gazeData: gazeData)
+                        } else {
+                            print("Error: Cannot record point, latestGazeData is nil.")
+                            // Optionally show an alert to the user
+                        }
+                    }
+                    // Disable if no target point (calibration finished) or no gaze data yet
+                    .disabled(calibrationViewModel.currentTargetPoint == nil || cameraManager.latestGazeData == nil)
+
+                    Button("Cancel Calibration") {
+                        calibrationViewModel.cancelCalibration()
+                    }
+                }
+            }
+            .padding() // Add padding around the buttons
+        } // End VStack for controls
+        // --- End UI Controls ---
+    } // End body
 }
 
 struct ContentView_Previews: PreviewProvider {

@@ -36,7 +36,7 @@ Step 1 (Display Camera Feed) is complete.
     *   **Goal:** Implement a simple UI overlay for calibration (displaying target points). Capture the corresponding `GazeInputData` when the user signals they are looking at the target.
     *   **Technologies:** SwiftUI, `Vision` data handling.
     *   **Deliverable:** A calibration mode where the user looks at specific points, and the application records pairs of (Target Screen Coordinate, `GazeInputData`). Data can initially be stored in memory or printed.
-    *   **Status:** Pending
+    *   **Status:** **Completed - 4/25/2025**
 
 5.  **Step 5: Implement Coordinate Mapping Function**
     *   **Goal:** Create a Swift function `estimateScreenCoords(gazeData: GazeInputData, calibrationData: [ScreenGazePair]) -> CGPoint?` that uses calibration data to estimate screen coordinates from live `GazeInputData`.
@@ -60,4 +60,4 @@ Step 1 (Display Camera Feed) is complete.
 
 ## Next Immediate Step
 
--   Begin implementation of **Step 4: Basic Calibration UI & Data Capture**.
+-   Begin implementation of **Step 5: Implement Coordinate Mapping Function**.

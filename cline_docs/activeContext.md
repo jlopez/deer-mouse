@@ -2,10 +2,18 @@
 
 ## Current Focus
 
-Implementing **Step 4: Basic Calibration UI & Data Capture** of Phase 2 (Calibration & Mapping).
+Implementing **Step 5: Implement Coordinate Mapping Function** of Phase 2 (Calibration & Mapping).
 
 ## Recent Changes
 
+-   **Completed Step 4: Basic Calibration UI & Data Capture:**
+    -   Defined `ScreenGazePair` struct in `GazeDataTypes.swift`.
+    -   Created `CalibrationViewModel.swift` to manage calibration state (`isCalibrating`, `calibrationPoints`, `collectedData`, `currentCalibrationTargetIndex`) and logic (`startCalibration`, `recordDataPoint`, `finishCalibration`, `cancelCalibration`).
+    -   Created `CalibrationTargetView.swift` to display a visual target.
+    -   Integrated `CalibrationViewModel` into `ContentView.swift`.
+    -   Added UI controls (Start/Record/Cancel buttons) to `ContentView.swift`.
+    -   Conditionally displayed `CalibrationTargetView` based on `calibrationViewModel.isCalibrating` and `currentTargetPoint`.
+    -   Implemented logic to capture `cameraManager.latestGazeData` and store `ScreenGazePair` on button press.
 -   **Completed Step 3: Detect Facial Landmarks (Pupils & Pose):**
     -   Created `GazeDataTypes.swift` with the `GazeInputData` struct.
     -   Modified `CameraManager` to use `VNDetectFaceLandmarksRequest`.
@@ -19,18 +27,13 @@ Implementing **Step 4: Basic Calibration UI & Data Capture** of Phase 2 (Calibra
 
 ## Next Steps
 
-1.  **Implement Step 4: Basic Calibration UI & Data Capture:**
-    *   **Goal:** Implement a simple UI overlay for calibration (displaying target points). Capture the corresponding `GazeInputData` when the user signals they are looking at the target.
+1.  **Implement Step 5: Implement Coordinate Mapping Function:**
+    *   **Goal:** Create a Swift function `estimateScreenCoords(gazeData: GazeInputData, calibrationData: [ScreenGazePair]) -> CGPoint?` that uses calibration data to estimate screen coordinates from live `GazeInputData`.
     *   **Tasks:**
-        *   Define a data structure to hold calibration pairs: `struct ScreenGazePair { let screenPoint: CGPoint; let gazeData: GazeInputData }`. (Likely in `GazeDataTypes.swift`).
-        *   Add state variables to `ContentView` or a new `CalibrationViewModel` to manage calibration state (e.g., `isCalibrating: Bool`, `calibrationPoints: [CGPoint]`, `collectedData: [ScreenGazePair]`, `currentCalibrationTargetIndex: Int`).
-        *   Create a `CalibrationTargetView` (or similar) in SwiftUI that displays a visual target (e.g., a circle) at a specific screen coordinate.
-        *   Modify `ContentView` to overlay `CalibrationTargetView` when `isCalibrating` is true, positioning it based on `calibrationPoints[currentCalibrationTargetIndex]`.
-        *   Add a mechanism (e.g., a button, key press) for the user to signal they are looking at the current target.
-        *   When the signal is received:
-            *   Capture the current `cameraManager.latestGazeData`.
-            *   Capture the screen coordinates of the current target.
-            *   Store the `ScreenGazePair`.
-            *   Advance `currentCalibrationTargetIndex`.
-            *   Handle completion of the calibration sequence.
-        *   Add UI elements (e.g., buttons) to start and potentially cancel calibration.
+        *   Decide on an initial mapping algorithm (e.g., simple interpolation, weighted average based on proximity, polynomial regression - start simple).
+        *   Create a new file (e.g., `CoordinateMapper.swift`) or add the function to an existing relevant file (perhaps `CalibrationViewModel` or a dedicated utility struct/class).
+        *   Implement the `estimateScreenCoords` function, taking live `GazeInputData` and the `collectedData` (`[ScreenGazePair]`) as input.
+        *   The function should return an estimated `CGPoint` representing screen coordinates, or `nil` if estimation isn't possible (e.g., insufficient calibration data).
+        *   Add basic logging or debugging output within the function to see the estimated coordinates.
+        *   (Optional) Add unit tests for the mapping function if feasible with sample data.
+        *   Integrate the call to this function into `ContentView` or `CameraManager` to continuously estimate gaze coordinates when not calibrating (initially just print the output).

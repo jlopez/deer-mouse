@@ -21,3 +21,10 @@ struct GazeInputData {
     // Consider adding interpupillary distance (IPD) later as a proxy for Z-distance.
     // let ipd: CGFloat?
 }
+
+/// Represents a pair of screen coordinates (where a calibration target was shown)
+/// and the corresponding gaze data captured when the user looked at that target.
+struct ScreenGazePair {
+    let screenPoint: CGPoint
+    let gazeData: GazeInputData
+}
