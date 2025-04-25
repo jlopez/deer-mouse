@@ -29,9 +29,22 @@
 		A5E6CF452DBBF79C00CCA3A8 /* deer-mouseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "deer-mouseUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A59F00B92DBBFEAD0026D472 /* Exceptions for "deer-mouse" folder in "deer-mouse" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A5E6CF2C2DBBF79B00CCA3A8 /* deer-mouse */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A5E6CF2F2DBBF79B00CCA3A8 /* deer-mouse */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A59F00B92DBBFEAD0026D472 /* Exceptions for "deer-mouse" folder in "deer-mouse" target */,
+			);
 			path = "deer-mouse";
 			sourceTree = "<group>";
 		};
@@ -398,6 +411,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "deer-mouse/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app uses the camera to track eye movements for mouse control.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -423,6 +438,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "deer-mouse/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app uses the camera to track eye movements for mouse control.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

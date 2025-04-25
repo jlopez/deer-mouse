@@ -2,21 +2,27 @@
 
 ## Current Focus
 
-Initializing the project and establishing the foundational Memory Bank documentation based on the initial planning phase.
+Implementing **Step 2: Detect Faces** of Phase 1 (Vision & Data Acquisition).
 
 ## Recent Changes
 
--   Defined the project scope and core functionality (eye gaze mouse control via webcam).
--   Selected the primary technology stack: Swift, SwiftUI, AVFoundation, Vision, CoreGraphics.
--   Refined the data input structure (`GazeInputData`) to include pupil coordinates and head pose (roll, pitch, yaw) for improved accuracy.
--   Established a 7-step development plan.
--   Created `cline_docs/productContext.md`.
+-   **Completed Step 1: Display Camera Feed:**
+    -   Created `CameraManager.swift` to handle `AVCaptureSession`.
+    -   Implemented logic to discover and select the external webcam.
+    -   Added `AVCaptureVideoDataOutput` to the session.
+    -   Created `CameraPreviewView.swift` using `NSViewRepresentable` to display the feed.
+    -   Correctly attached the `AVCaptureVideoPreviewLayer` as a sublayer using a Coordinator.
+    -   Updated `ContentView.swift` to integrate the camera manager and preview.
+    -   Troubleshot and resolved issues related to device selection and layer rendering (`videoGravity`).
+-   Updated Memory Bank (`progress.md`, `activeContext.md`).
 
 ## Next Steps
 
-1.  Complete the creation of the initial Memory Bank files (`activeContext.md`, `systemPatterns.md`, `techContext.md`, `progress.md`).
-2.  Begin implementation of **Step 1: Display Camera Feed** using `AVFoundation` and SwiftUI. This involves:
-    *   Setting up `AVCaptureSession`.
-    *   Getting webcam input.
-    *   Creating a video data output.
-    *   Displaying the captured frames in a SwiftUI view.
+1.  **Implement Step 2: Detect Faces:**
+    *   Modify `CameraManager` to handle `AVCaptureVideoDataOutputSampleBufferDelegate`.
+    *   Process captured `CMSampleBuffer` frames.
+    *   Create and perform `VNDetectFaceRectanglesRequest` using the `Vision` framework.
+    *   Extract face bounding boxes (`VNFaceObservation`).
+    *   Publish the detected bounding boxes (or relevant geometry).
+    *   Create an overlay `View` in SwiftUI to draw rectangles based on the published bounding boxes, scaled to the preview coordinate system.
+    *   Integrate the overlay view into `ContentView`.
