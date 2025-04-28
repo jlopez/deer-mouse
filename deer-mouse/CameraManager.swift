@@ -9,6 +9,11 @@ class CameraManager: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleB
     @Published var session = AVCaptureSession()
     @Published var faceBoundingBoxes: [CGRect] = [] // Keep for potential overlay drawing
     @Published var latestGazeData: GazeInputData? = nil // Published property for gaze data
+    @Published var estimatedScreenCoordinate: CGPoint? = nil // Published estimated coordinate
+
+    // Calibration state
+    private var calibrationData: [ScreenGazePair] = []
+    private var isCalibrationComplete: Bool = false
 
     private var device: AVCaptureDevice?
     private var input: AVCaptureDeviceInput?
@@ -123,6 +128,16 @@ class CameraManager: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleB
         }
     }
 
+    // Method to receive calibration data from ViewModel
+    func setCalibrationData(_ data: [ScreenGazePair]) {
+        DispatchQueue.main.async { // Ensure updates happen on the main thread
+            self.calibrationData = data
+            self.isCalibrationComplete = !data.isEmpty // Mark as complete if data is provided
+            self.estimatedScreenCoordinate = nil // Reset estimate when calibration changes
+            print("CameraManager received calibration data (\(data.count) points). Calibration complete: \(self.isCalibrationComplete)")
+        }
+    }
+
     // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
 
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
@@ -225,9 +240,24 @@ class CameraManager: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleB
 
 
             // Update the published properties on the main thread
+            // Update the published properties on the main thread
             DispatchQueue.main.async {
                 self.faceBoundingBoxes = boundingBoxes // Update bounding boxes
                 self.latestGazeData = currentGazeData // Update gaze data (will be nil if no face/landmarks)
+
+                // --- Estimate Screen Coordinates if Calibrated ---
+                if self.isCalibrationComplete, let liveGaze = currentGazeData {
+                    // Call the mapper function
+                    let estimatedCoords = CoordinateMapper.estimateScreenCoords(
+                        gazeData: liveGaze,
+                        calibrationData: self.calibrationData
+                    )
+                    self.estimatedScreenCoordinate = estimatedCoords
+                    // if let coords = estimatedCoords { print("Estimated Screen Coords: \(coords)") } // Debug print
+                } else {
+                    // If not calibrated or no gaze data, clear the estimate
+                    self.estimatedScreenCoordinate = nil
+                }
                  // if let gaze = currentGazeData { print("Gaze: \(gaze)") } // Optional debug print
             }
         }

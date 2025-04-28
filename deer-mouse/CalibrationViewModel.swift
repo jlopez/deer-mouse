@@ -4,6 +4,9 @@ import SwiftUI // For CGPoint and ObservableObject
 /// Manages the state and logic for the eye gaze calibration process.
 class CalibrationViewModel: ObservableObject {
 
+    // Reference to the CameraManager to pass calibration data
+    private weak var cameraManager: CameraManager?
+
     /// Indicates whether the calibration process is currently active.
     @Published var isCalibrating: Bool = false
 
@@ -31,8 +34,16 @@ class CalibrationViewModel: ObservableObject {
         return calibrationPoints[currentCalibrationTargetIndex]
     }
 
+    // Initializer to receive the CameraManager
+    init(cameraManager: CameraManager) {
+        self.cameraManager = cameraManager
+    }
+
     /// Starts the calibration process.
     func startCalibration() {
+        // Also tell CameraManager calibration is starting (so it stops estimating)
+        cameraManager?.setCalibrationData([]) // Pass empty array to reset state
+
         collectedData = [] // Clear previous data
         currentCalibrationTargetIndex = 0
         isCalibrating = true
@@ -66,7 +77,8 @@ class CalibrationViewModel: ObservableObject {
     func finishCalibration() {
         isCalibrating = false
         print("Calibration finished. Collected \(collectedData.count) data points.")
-        // TODO: Trigger the mapping model calculation here or elsewhere.
+        // Pass the collected data to the CameraManager
+        cameraManager?.setCalibrationData(collectedData)
     }
 
     /// Cancels the calibration process.
@@ -74,6 +86,8 @@ class CalibrationViewModel: ObservableObject {
         isCalibrating = false
         collectedData = []
         currentCalibrationTargetIndex = 0
+        // Also tell CameraManager calibration is cancelled (so it stops estimating)
+        cameraManager?.setCalibrationData([]) // Pass empty array to reset state
         print("Calibration cancelled.")
     }
 }

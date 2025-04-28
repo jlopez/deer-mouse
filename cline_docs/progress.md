@@ -1,12 +1,16 @@
 # Progress: Eye Gaze Mouse Control
 
-## Current Status: Phase 1 (Vision & Data Acquisition)
+## Current Status: Phase 2 (Calibration & Mapping)
 
-Step 1 (Display Camera Feed) is complete.
+Steps 1-5 are complete.
 
 ## What Works
 
 -   The application displays a live feed from the selected (external) webcam.
+-   Detects faces and facial landmarks (pupils, pose) in the video feed.
+-   Provides a basic UI for calibration, collecting screen coordinate and gaze data pairs.
+-   Estimates screen coordinates based on live gaze data and calibration using a KNN algorithm.
+-   Displays a visual indicator (red circle) at the estimated gaze position after calibration.
 
 ## Detailed Plan & Remaining Steps
 
@@ -39,10 +43,10 @@ Step 1 (Display Camera Feed) is complete.
     *   **Status:** **Completed - 4/25/2025**
 
 5.  **Step 5: Implement Coordinate Mapping Function**
-    *   **Goal:** Create a Swift function `estimateScreenCoords(gazeData: GazeInputData, calibrationData: [ScreenGazePair]) -> CGPoint?` that uses calibration data to estimate screen coordinates from live `GazeInputData`.
-    *   **Technologies:** Swift logic, geometry/math.
-    *   **Deliverable:** A testable function that estimates screen coordinates. Output can be printed to the console.
-    *   **Status:** Pending
+    *   **Goal:** Create a Swift function `estimateScreenCoords(gazeData: GazeInputData, calibrationData: [ScreenGazePair]) -> CGPoint?` that uses calibration data to estimate screen coordinates from live `GazeInputData`. Implement a visual indicator for the estimated point.
+    *   **Technologies:** Swift logic, geometry/math (KNN), SwiftUI.
+    *   **Deliverable:** A function that estimates screen coordinates using KNN. A visual indicator (red circle) is displayed on the screen at the estimated position after calibration.
+    *   **Status:** **Completed - 4/28/2025**
 
 **Phase 3: Control & Refinement**
 
@@ -60,4 +64,4 @@ Step 1 (Display Camera Feed) is complete.
 
 ## Next Immediate Step
 
--   Begin implementation of **Step 5: Implement Coordinate Mapping Function**.
+-   Begin implementation of **Step 6: Mouse Pointer Control**.
