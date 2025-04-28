@@ -9,11 +9,19 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var cameraManager = CameraManager()
-    @StateObject private var calibrationViewModel = CalibrationViewModel() // Add Calibration VM
+    // Initialize calibrationViewModel in init to pass cameraManager
+    @StateObject private var calibrationViewModel: CalibrationViewModel
 
     // Define a constant for the expected video preview size for scaling calculations
     // TODO: Ideally, get this dynamically from CameraManager or the video format.
-    private let videoPreviewSize = CGSize(width: 1920, height: 1080)
+    private let videoPreviewSize = CGSize(width: 1920, height: 1080) // Example size
+
+    // Custom initializer
+    init() {
+        let manager = CameraManager()
+        _cameraManager = StateObject(wrappedValue: manager)
+        _calibrationViewModel = StateObject(wrappedValue: CalibrationViewModel(cameraManager: manager))
+    }
 
     var body: some View {
         // --- UI Controls ---
@@ -57,7 +65,20 @@ struct ContentView: View {
                 }
                 // --- End Calibration Target Overlay ---
 
+                // --- Gaze Indicator Overlay ---
+                if !calibrationViewModel.isCalibrating, let estimatedPoint = cameraManager.estimatedScreenCoordinate {
+                    Circle()
+                        .fill(Color.red.opacity(0.7))
+                        .frame(width: 20, height: 20)
+                        .position(estimatedPoint) // Position based on estimated coordinates
+                        // Ensure the indicator covers the same area conceptually
+                        .frame(minWidth: 640, minHeight: 480)
+                        .allowsHitTesting(false)
+                }
+                // --- End Gaze Indicator Overlay ---
+
             } // End ZStack
+            .frame(minWidth: 640, minHeight: 480) // Ensure ZStack has a defined frame
 
             Spacer() // Push controls to the bottom
             HStack {

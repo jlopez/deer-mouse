@@ -6,7 +6,7 @@ Deer Mouse aims to provide a hands-free method for controlling the macOS mouse c
 
 This project is primarily an exploration and accessibility tool.
 
-## Current Status (as of 4/25/2025)
+## Current Status (as of 4/28/2025)
 
 -   **Phase 1: Vision & Data Acquisition**
     -   ✅ **Step 1: Display Camera Feed:** The application successfully displays a live feed from the selected webcam.
@@ -14,6 +14,9 @@ This project is primarily an exploration and accessibility tool.
     -   ✅ **Step 3: Detect Facial Landmarks (Pupils & Pose):** The application detects pupils and head pose, populating `GazeInputData`, and displays pupil indicators.
 -   **Phase 2: Calibration & Mapping**
     -   ✅ **Step 4: Basic Calibration UI & Data Capture:** Implemented UI for calibration target display and controls to capture `ScreenGazePair` data.
+    -   ✅ **Step 5: Implement Coordinate Mapping Function:** Implemented KNN mapping and displays a visual indicator (red circle) for the estimated gaze point after calibration.
+-   **Phase 3: Control & Refinement**
+    -   ⏳ **Step 6: Mouse Pointer Control:** Next step.
     -   ... (See `cline_docs/progress.md` for full plan)
 
 ## Core Technologies
